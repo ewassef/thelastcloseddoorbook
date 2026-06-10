@@ -370,7 +370,7 @@ export default function Home() {
             <a href="#updates">Newsletter</a>
           </div>
           <div className="footer-links">
-            <a href="#" aria-label="LinkedIn placeholder">LinkedIn</a>
+            <a href="https://www.linkedin.com/in/eddiewassef/" target="_blank" rel="noreferrer">LinkedIn</a>
             <a href="mailto:hello@example.com">Contact</a>
             <a href="#" aria-label="Privacy policy placeholder">Privacy</a>
           </div>
