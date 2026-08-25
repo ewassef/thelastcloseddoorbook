@@ -1,405 +1,490 @@
-"use client";
-
 import Image from "next/image";
-import { FormEvent, MouseEvent, useEffect, useRef, useState } from "react";
+import NotifyForm from "./notify-form";
+import { SPEAKING } from "./speaking-data";
+import {
+  BUY_HEADLINE,
+  BUY_STATUS,
+  DISCUSSION_QUESTIONS,
+  LINKS,
+  POSTS,
+  PRAISE,
+  RETAILERS,
+  SHOW_PRAISE,
+  SHOW_SPEAKING,
+  SITE,
+} from "./site";
 
-const themes = [
-  {
-    number: "01",
-    title: "The Risk Illusion",
-    text: "The company believed proprietary software reduced risk and open source increased it. The story asks what happens when the opposite becomes true.",
-  },
-  {
-    number: "02",
-    title: "The Inner Source Bridge",
-    text: "Before the company could trust the outside world, it had to learn how to trust itself. Inner sourcing became the hallway where unlikely allies met.",
-  },
-  {
-    number: "03",
-    title: "The Council of Doubt",
-    text: "The skeptics were not blockers. They were protectors shaped by old scars, old outages, old audits, and old promises.",
-  },
-  {
-    number: "04",
-    title: "The Fellowship",
-    text: "Not heroes. Practitioners. The people close enough to the work to see the future arriving before the dashboards showed it.",
-  },
-  {
-    number: "05",
-    title: "AI's Quiet Pressure",
-    text: "AI did not start the crisis. It made the existing delays impossible to hide.",
-  },
-  {
-    number: "06",
-    title: "The Talent Signal",
-    text: "When modern builders leave, they rarely say the architecture is the reason. But it usually is.",
-  },
+const NAV = [
+  { href: "#book", label: "The Book" },
+  { href: "#excerpt", label: "Excerpt" },
+  ...(SHOW_PRAISE ? [{ href: "#praise", label: "Praise" }] : []),
+  { href: "#author", label: "Author" },
+  { href: "#writing", label: "Writing" },
 ];
 
-const readers = [
-  "Technology executives trying to modernize without breaking trust.",
-  "Enterprise architects who see the gap between strategy decks and delivery reality.",
-  "Platform engineers building the roads others will travel.",
-  "Security, legal, and risk leaders asked to protect a company that must also move faster.",
-  "Product leaders tired of explaining why simple things take months.",
-  "Anyone who has ever sat in a meeting and realized the process was safer than the outcome.",
+const STATS = [
+  { num: "7", label: "Acts" },
+  { num: "56", label: "Chapters" },
+  { num: "649", label: "Pages" },
+  { num: "2026", label: "First edition" },
 ];
-
-const praise = [
-  "A rare enterprise technology story that understands both the boardroom and the build pipeline.",
-  "This is the transformation story many companies are living but few are willing to say out loud.",
-  "Not another AI book. Not another open source manifesto. Something more useful: a story about why change is so hard.",
-];
-
-function ArrowIcon() {
-  return <span aria-hidden="true">↗</span>;
-}
 
 export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [sampleOpen, setSampleOpen] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const coverRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add("is-visible");
-        });
-      },
-      { threshold: 0.12 },
-    );
-    document.querySelectorAll(".reveal").forEach((node) => observer.observe(node));
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = sampleOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [sampleOpen]);
-
-  function tiltCover(event: MouseEvent<HTMLDivElement>) {
-    const element = coverRef.current;
-    if (!element || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const rect = element.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width - 0.5;
-    const y = (event.clientY - rect.top) / rect.height - 0.5;
-    element.style.transform = `perspective(1100px) rotateY(${x * 7}deg) rotateX(${-y * 6}deg) translateY(-8px)`;
-  }
-
-  function resetCover() {
-    if (coverRef.current) coverRef.current.style.transform = "";
-  }
-
-  function submitForm(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setSubmitted(true);
-  }
-
-  function closeMenu() {
-    setMenuOpen(false);
-  }
-
   return (
-    <main>
-      <header className="site-header">
-        <a className="wordmark" href="#top" aria-label="The Last Closed Door home">
-          <span className="door-mark" />
-          <span>The Last Closed Door</span>
+    <>
+      <a className="skip-link" href="#top">
+        Skip to content
+      </a>
+
+      <header className="header">
+        <a className="header__mark" href="#top">
+          {SITE.title}
         </a>
-        <nav className={menuOpen ? "nav-links is-open" : "nav-links"} aria-label="Main navigation">
-          <a href="#about" onClick={closeMenu}>About</a>
-          <a href="#themes" onClick={closeMenu}>Themes</a>
-          <a href="#praise" onClick={closeMenu}>Praise</a>
-          <a href="#author" onClick={closeMenu}>Author</a>
-          <a href="#updates" onClick={closeMenu}>Updates</a>
-          <a href="#speaking" onClick={closeMenu}>Speaking</a>
+        <nav className="header__nav" aria-label="Primary">
+          {NAV.map((item) => (
+            <a key={item.href} className="header__link" href={item.href}>
+              {item.label}
+            </a>
+          ))}
+          <a className="header__cta" href="#buy">
+            Get the Book
+          </a>
         </nav>
-        <a className="button button-small header-cta" href="#updates">Get Updates</a>
-        <button
-          className="menu-button"
-          type="button"
-          aria-label="Toggle navigation"
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((open) => !open)}
-        >
-          <span />
-          <span />
-        </button>
       </header>
 
-      <section className="hero" id="top">
-        <div className="hero-glow" />
-        <div className="hero-copy reveal">
-          <p className="eyebrow">A novel of enterprise transformation</p>
-          <h1>The Last<br /><em>Closed Door</em></h1>
-          <p className="hero-tagline">
-            A story about what happens when the systems that made a company successful
-            become the very things holding it back.
-          </p>
-          <p className="hero-description">
-            A narrative about enterprise technology, open source, AI, and the quiet courage
-            required to change before the market forces the issue.
-          </p>
-          <div className="button-row">
-            <a className="button button-primary" href="#updates">Join the Launch List <ArrowIcon /></a>
-            <button className="button button-secondary" type="button" onClick={() => setSampleOpen(true)}>
-              Read a Sample
-            </button>
+      <main id="top">
+        {/* Hero ------------------------------------------------------------ */}
+        <section className="hero">
+          <div className="hero__copy">
+            <p className="hero__kicker">{SITE.subtitle}</p>
+            <h1 className="serif hero__title">{SITE.title}</h1>
+            <p className="serif hero__tagline">
+              Some doors aren&rsquo;t locked. They&rsquo;re just the ones we stopped opening.
+            </p>
+            <p className="hero__byline">
+              {SITE.author} &nbsp;·&nbsp; {SITE.edition}
+            </p>
+            <div className="hero__actions">
+              <a className="btn btn--gold" href="#buy">
+                Where to buy
+              </a>
+              <a className="btn btn--ghost" href="#excerpt">
+                Read the opening
+              </a>
+            </div>
           </div>
-          <p className="hero-audience">
-            For technology leaders, architects, builders, and executives navigating the
-            shift from closed systems to open ecosystems.
-          </p>
-        </div>
-        <div className="cover-stage reveal" onMouseMove={tiltCover} onMouseLeave={resetCover}>
-          <div className="cover-halo" />
-          <div className="book-cover" ref={coverRef}>
+          <div className="hero__cover">
             <Image
-              src="/images/book-cover.png"
-              alt="Book cover for The Last Closed Door by Eddie Wassef"
-              width={1024}
-              height={1536}
+              src="/images/book-cover.jpg"
+              alt={`${SITE.title} — front cover`}
+              width={900}
+              height={1352}
               priority
             />
           </div>
-          <p className="cover-caption"><span>Written by</span> Eddie Wassef</p>
-        </div>
-      </section>
+        </section>
 
-      <section className="positioning section-pad">
-        <div className="section-intro reveal">
-          <p className="eyebrow">The story beneath the strategy</p>
-          <h2>Part enterprise transformation story.<br />Part technology memoir. <em>Part warning signal.</em></h2>
-        </div>
-        <div className="position-grid">
-          <article className="position-card reveal">
-            <span>01</span>
-            <h3>Open Source as Strategy</h3>
-            <p>Not a tooling choice. A different operating model.</p>
-          </article>
-          <article className="position-card reveal">
-            <span>02</span>
-            <h3>AI as a Forcing Function</h3>
-            <p>The accelerator that exposes every delay, dependency, and illusion of control.</p>
-          </article>
-          <article className="position-card reveal">
-            <span>03</span>
-            <h3>Talent as the Signal</h3>
-            <p>The best people do not just leave jobs. They leave operating models.</p>
-          </article>
-        </div>
-      </section>
-
-      <section className="about section-pad" id="about">
-        <div className="about-heading reveal">
-          <p className="eyebrow">Inside the story</p>
-          <h2>About<br /><em>the Book</em></h2>
-          <div className="rule" />
-          <p className="about-pull">Neither side was wrong.<br />That was the problem.</p>
-        </div>
-        <div className="about-copy reveal">
-          <p className="lead">The Last Closed Door follows a large enterprise at the moment its confidence begins to fracture.</p>
-          <p>For years, the company believed its proprietary systems were a source of safety. They had contracts, controls, support agreements, and processes tuned over decades. On paper, it looked responsible. In practice, it had become slow.</p>
-          <p>Then the market changed.</p>
-          <p>AI-native competitors began moving faster than anyone expected. Vendors that once sold certainty began pivoting toward open source. Engineers quietly left for companies where the tools felt modern and the work felt alive. Customers stopped asking for roadmaps and started asking why everything took so long.</p>
-          <p>Inside the company, two groups began to form.</p>
-          <p>One was the <strong>Council of Doubt</strong>: experienced leaders who had spent their careers protecting the enterprise from risk.</p>
-          <p>The other was the <strong>Fellowship</strong>: builders, operators, product thinkers, and engineers who had found each other through inner sourcing and knew the old model was breaking.</p>
-          <p>This is not a story about heroes defeating villains. It is a story about incentives, fear, trust, legacy, and the difficult work of opening the last closed door.</p>
-        </div>
-      </section>
-
-      <section className="themes section-pad" id="themes">
-        <div className="section-intro reveal">
-          <p className="eyebrow">Six currents</p>
-          <h2>The forces moving<br /><em>behind the walls.</em></h2>
-        </div>
-        <div className="theme-grid">
-          {themes.map((theme) => (
-            <article className="theme-card reveal" key={theme.title}>
-              <span>{theme.number}</span>
-              <h3>{theme.title}</h3>
-              <p>{theme.text}</p>
-              <div className="card-line" />
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="pull-quote">
-        <div className="quote-window" />
-        <blockquote className="reveal">
-          <span className="quote-mark">“</span>
-          The hardest part of transformation is not convincing people that the future is
-          coming. It is helping them grieve the systems that once made them successful.
-        </blockquote>
-      </section>
-
-      <section className="readers section-pad">
-        <div className="readers-heading reveal">
-          <p className="eyebrow">Who this book is for</p>
-          <h2>For those asked to<br /><em>protect and progress.</em></h2>
-        </div>
-        <div className="reader-list">
-          {readers.map((reader, index) => (
-            <div className="reader-item reveal" key={reader}>
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              <p>{reader}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="praise section-pad" id="praise">
-        <div className="section-intro reveal">
-          <p className="eyebrow">Advance praise</p>
-          <h2>Early words from<br /><em>inside the industry.</em></h2>
-          <p className="section-deck">Endorsements coming soon from technology leaders, open source practitioners, platform engineers, and executives who have lived this story from the inside.</p>
-        </div>
-        <div className="praise-grid">
-          {praise.map((quote) => (
-            <figure className="praise-card reveal" key={quote}>
-              <blockquote>“{quote}”</blockquote>
-              <figcaption>Coming Soon</figcaption>
-            </figure>
-          ))}
-        </div>
-      </section>
-
-      <section className="author section-pad" id="author">
-        <div className="author-portrait reveal" aria-label="Author portrait placeholder">
-          <span>EW</span>
-          <small>Author portrait forthcoming</small>
-        </div>
-        <div className="author-copy reveal">
-          <p className="eyebrow">A note from the author</p>
-          <h2>Architecture is<br /><em>also about trust.</em></h2>
-          <p>I have spent much of my career in the space between enterprise control and open source possibility.</p>
-          <p>I understand why large organizations protect what they have. I also understand what happens when protection becomes paralysis.</p>
-          <p>This book came from years of watching talented people struggle inside systems that were built for a different era. Some of those systems were technical. Most were human.</p>
-          <p><em>The Last Closed Door</em> is fiction, but it is built from patterns that will feel familiar to anyone who has worked inside a large technology organization during a platform shift.</p>
-          <p>It is a story about architecture, yes. But more than that, it is a story about trust.</p>
-          <a className="text-link" href="#updates">Follow the Journey <ArrowIcon /></a>
-        </div>
-      </section>
-
-      <section className="updates section-pad" id="updates">
-        <div className="updates-copy reveal">
-          <p className="eyebrow">Keep the door open</p>
-          <h2>Join the<br /><em>Launch List</em></h2>
-          <p>Get updates as the book moves toward release, including sample chapters, behind-the-scenes notes, launch announcements, and practical reflections on open source, AI, platform engineering, and enterprise transformation.</p>
-          <div className="bonus-grid">
-            {[
-              ["Sample Chapter", "A first look at the opening crisis."],
-              ["Reader Notes", "Behind-the-scenes reflections on the themes."],
-              ["Launch Updates", "Release date, pre-order links, and events."],
-              ["Discussion Guide", "For technology leadership teams and book clubs."],
-            ].map(([title, text]) => (
-              <div className="bonus" key={title}><h3>{title}</h3><p>{text}</p></div>
-            ))}
-          </div>
-        </div>
-        <div className="form-panel reveal">
-          {submitted ? (
-            <div className="success-message" role="status">
-              <span className="success-icon">✓</span>
-              <h3>You’re on the list.</h3>
-              <p>Thank you. The next note will arrive when there is something worth opening.</p>
-            </div>
-          ) : (
-            <form onSubmit={submitForm}>
-              <div className="field-row">
-                <label>Name<input name="name" type="text" placeholder="Your name" required /></label>
-                <label>Email<input name="email" type="email" placeholder="you@company.com" required /></label>
+        {/* About the book -------------------------------------------------- */}
+        <section id="book" className="section">
+          <div className="shell">
+            <p className="eyebrow book__eyebrow">About the Book</p>
+            <p className="serif book__lead">
+              For decades, the systems that run the world were built to last, and to stay
+              closed.
+            </p>
+            <div className="book__cols">
+              <div className="book__col">
+                <p>Reliable. Controlled. Predictable. But as the world changed, the systems didn&rsquo;t.</p>
+                <p>
+                  An enterprise architect looks back on a career spent inside one of the last
+                  closed enterprises: an industrial giant whose success was built on certainty,
+                  and whose survival now depends on giving some of it up.
+                </p>
               </div>
-              <label>Role
-                <select name="role" defaultValue="">
-                  <option value="" disabled>Select your role</option>
-                  <option>Executive</option>
-                  <option>Architect</option>
-                  <option>Engineer</option>
-                  <option>Product Leader</option>
-                  <option>SRE / Operations</option>
-                  <option>Security / Risk / Legal</option>
-                  <option>Other</option>
-                </select>
-              </label>
-              <label className="checkbox-label">
-                <input type="checkbox" required />
-                <span>Send me occasional updates about the book and related essays.</span>
-              </label>
-              <button className="button button-primary form-button" type="submit">Join the List <ArrowIcon /></button>
-              <p className="form-note">Quiet updates only. No noise, no list sharing.</p>
-            </form>
-          )}
-        </div>
-      </section>
+              <div className="book__col">
+                <p>
+                  The story runs through projects, budgets, hallway conversations, and a few
+                  decisions nobody thought were decisions at the time.
+                </p>
+                <p>
+                  It is about technology, but mostly it is about incentives, inertia, and who
+                  carries the risk when nothing changes.{" "}
+                  <em>Nothing is the expensive option.</em>
+                </p>
+              </div>
+            </div>
+            <div className="stats">
+              {STATS.map((stat) => (
+                <div key={stat.label} className="stat">
+                  <p className="serif stat__num">{stat.num}</p>
+                  <p className="stat__label">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
 
-      <section className="speaking section-pad" id="speaking">
-        <div className="speaking-copy reveal">
-          <p className="eyebrow">Speaking & workshops</p>
-          <h2>Bring the conversation<br /><em>to your organization.</em></h2>
-          <p>The themes in <em>The Last Closed Door</em> are already showing up inside leadership offsites, architecture reviews, platform strategy sessions, and AI governance conversations.</p>
-          <a className="button button-primary" href="mailto:hello@example.com?subject=Speaking inquiry">Request a Conversation <ArrowIcon /></a>
-        </div>
-        <div className="topic-list reveal">
-          {[
-            "Open source as enterprise strategy",
-            "AI as a forcing function for modernization",
-            "Platform engineering and the future SDLC",
-            "The talent cost of legacy technology",
-            "Vendor lock-in and ecosystem resilience",
-            "Inner sourcing as a cultural bridge",
-          ].map((topic, index) => <div key={topic}><span>{index + 1}</span>{topic}</div>)}
-        </div>
-      </section>
+        {/* Excerpt --------------------------------------------------------- */}
+        <section id="excerpt" className="excerpt">
+          <div className="excerpt__inner">
+            <p className="excerpt__eyebrow">Read the Opening</p>
+            <h2 className="serif excerpt__title">Chapter 1: Before</h2>
+            <div className="excerpt__body">
+              <p>
+                <span className="serif excerpt__drop">T</span>he thing I remember most clearly
+                is that nobody in the room reacted.
+              </p>
+              <p>
+                It was a Tuesday afternoon, sometime in the spring, in a conference room on the
+                kind of floor that has its own coffee machine and a view of a parking lot. Seven
+                of us. A status review. The slide on the screen showed a capability we had been
+                preparing to scope for the next quarter: architecture diagrams, vendor shortlist,
+                three internal teams aligning calendars to align other calendars. A respectable
+                enterprise effort.
+              </p>
+              <p>
+                While the meeting was happening, on a second monitor I had not bothered to close,
+                a notification surfaced from a public repository I had been following out of
+                professional curiosity. Someone I had never met, in a city I could not have placed
+                on a map, had merged a pull request that did roughly what our slide proposed. Not
+                the enterprise-grade version. Not the one with the audit hooks and the regional
+                failover. But the working core of it. In an afternoon. With three other people he
+                appeared to know only through their handles.
+              </p>
+              <p>I closed the laptop and went back to the meeting.</p>
+              <p>
+                That is the part I want to be honest about. I did not say anything. I did not
+                point at the screen and say, look at this, the world we are pricing for next
+                quarter just shipped for free while we were discussing the procurement path. I sat
+                there and nodded at the right moments, because the meeting was real and the people
+                in it were good at their jobs and the work we were debating was, by every measure
+                we had been trained to apply, the correct work to be doing.
+              </p>
+              <p>But something in me had moved a quarter inch, and I knew it.</p>
+            </div>
+            <div className="excerpt__foot">
+              <p>The chapter continues for another nine pages.</p>
+              <a className="btn btn--dark" href="#buy">
+                Get the full book
+              </a>
+            </div>
+          </div>
+        </section>
 
-      <footer>
-        <div className="footer-main">
-          <div>
-            <p className="footer-title">The Last<br />Closed Door</p>
-            <p className="footer-author">A novel by Eddie Wassef</p>
+        {/* Praise ---------------------------------------------------------- */}
+        {SHOW_PRAISE && PRAISE.length > 0 && (
+          <section id="praise" className="section">
+            <div className="shell">
+              <div className="praise__head">
+                <p className="eyebrow" style={{ margin: 0 }}>
+                  Early Praise
+                </p>
+              </div>
+              <div className="praise__grid">
+                {PRAISE.map((entry) => (
+                  <blockquote key={entry.attribution} className="quote">
+                    <p>{entry.quote}</p>
+                    <footer>{entry.attribution}</footer>
+                  </blockquote>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Where to buy ---------------------------------------------------- */}
+        <section id="buy" className="section section--alt">
+          <div className="shell buy__grid">
+            <div>
+              <p className="eyebrow">Where to Buy</p>
+              <h2 className="serif section-title">{BUY_HEADLINE}</h2>
+              <p className="buy__note">
+                Paperback, hardcover, and Kindle edition. Audiobook and Barnes &amp; Noble to
+                follow.
+              </p>
+              <div className="buy__list">
+                {RETAILERS.map((retailer) => {
+                  const status = retailer.status ?? BUY_STATUS;
+                  if (retailer.status) {
+                    return (
+                      <div key={retailer.name} className="buy__row buy__row--planned">
+                        <span className="buy__name">{retailer.name}</span>
+                        <span className="buy__status">{status}</span>
+                      </div>
+                    );
+                  }
+                  return (
+                    <a
+                      key={retailer.name}
+                      className="buy__row buy__row--live"
+                      href={retailer.url ?? "#notify"}
+                      {...(retailer.url ? { target: "_blank", rel: "noopener" } : {})}
+                    >
+                      <span className="buy__name">{retailer.name}</span>
+                      <span className="buy__status">{status}</span>
+                    </a>
+                  );
+                })}
+              </div>
+              <p className="mono buy__isbn">
+                ISBN (paperback) {SITE.isbn} · retailer links pending
+              </p>
+            </div>
+
+            <div id="notify" className="notify">
+              <p className="notify__eyebrow">Publication List</p>
+              <h3 className="serif notify__title">Know the day it&rsquo;s available</h3>
+              <NotifyForm />
+            </div>
           </div>
-          <div className="footer-links">
-            <a href="#about">About the Book</a>
-            <a href="#author">About the Author</a>
-            <a href="#updates">Newsletter</a>
+        </section>
+
+        {/* Author ---------------------------------------------------------- */}
+        <section id="author" className="section">
+          <div className="shell author__grid">
+            <div>
+              <Image
+                className="author__photo"
+                src="/images/eddie-wassef.jpg"
+                alt={SITE.author}
+                width={815}
+                height={540}
+              />
+              <p className="mono author__caption">{SITE.author}</p>
+            </div>
+            <div>
+              <p className="eyebrow">The Author</p>
+              <h2 className="serif author__title">
+                Twenty years inside the rooms this book is set in.
+              </h2>
+              <div className="author__bio">
+                <p>
+                  Eddie Wassef is an enterprise architect who has spent his career building and
+                  modernizing the systems that run industry: the ones with procurement cycles,
+                  architecture boards, and a good reason behind every control they carry.
+                </p>
+                <p>
+                  He writes about platform engineering, inner source, AI, and architecture
+                  modernization at{" "}
+                  <a href={LINKS.publication} target="_blank" rel="noopener">
+                    Archetypical Software
+                  </a>
+                  , on topics from the end of the traditional SDLC to how AI agents get governed
+                  once they reach real production.
+                </p>
+                <p>
+                  <em>{SITE.title}</em> is his first novel. It is fiction and the characters are
+                  invented. The meetings are not.
+                </p>
+                <p>
+                  Over twenty years in and around enterprise technology have taught him that the
+                  hardest systems to change are rarely the technical ones.
+                </p>
+              </div>
+              <div className="chips">
+                <a className="chip" href={LINKS.medium} target="_blank" rel="noopener">
+                  Medium
+                </a>
+                <a className="chip" href={LINKS.archetypical} target="_blank" rel="noopener">
+                  Archetypical Software
+                </a>
+                <a className="chip" href={LINKS.linkedin} target="_blank" rel="noopener">
+                  LinkedIn
+                </a>
+                <a className="chip" href={LINKS.twitter} target="_blank" rel="noopener">
+                  @ewassef
+                </a>
+                <a className="chip" href={LINKS.github} target="_blank" rel="noopener">
+                  GitHub
+                </a>
+                <a className="chip" href={LINKS.sessionize} target="_blank" rel="noopener">
+                  Sessionize
+                </a>
+              </div>
+            </div>
           </div>
-          <div className="footer-links">
-            <a href="https://www.linkedin.com/in/eddiewassef/" target="_blank" rel="noreferrer">LinkedIn</a>
-            <a href="mailto:hello@example.com">Contact</a>
-            <a href="#" aria-label="Privacy policy placeholder">Privacy</a>
+        </section>
+
+        {/* Writing --------------------------------------------------------- */}
+        <section id="writing" className="section">
+          <div className="shell">
+            <div className="split-head">
+              <div>
+                <p className="eyebrow" style={{ marginBottom: 16 }}>
+                  From the Blog
+                </p>
+                <h2 className="serif section-title" style={{ marginBottom: 0 }}>
+                  Latest at Archetypical Software
+                </h2>
+              </div>
+              <a
+                className="split-head__more"
+                href={LINKS.publication}
+                target="_blank"
+                rel="noopener"
+              >
+                All posts →
+              </a>
+            </div>
+            <div className="card-rail">
+              {POSTS.map((post) => (
+                <a key={post.url} className="card" href={post.url} target="_blank" rel="noopener">
+                  <span className="card__meta">{post.meta}</span>
+                  <span className="card__title">{post.title}</span>
+                  <span className="card__blurb">{post.blurb}</span>
+                  <span className="card__more">Read on Medium →</span>
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
-        <div className="footer-bottom">
-          <p>The Last Closed Door is a work of fiction grounded in real enterprise patterns.</p>
-          <p>© {new Date().getFullYear()} Eddie Wassef</p>
+        </section>
+
+        {/* Reading groups -------------------------------------------------- */}
+        <section id="clubs" className="section section--alt">
+          <div className="shell clubs__grid">
+            <div>
+              <p className="eyebrow">Reading Groups</p>
+              <h2 className="serif section-title" style={{ maxWidth: "24ch" }}>
+                Discussion guide for teams and book clubs
+              </h2>
+              <p className="clubs__lead">
+                Six questions to start with, whether you&rsquo;re reading it with an architecture
+                guild, a leadership team, or a book club that just wants the argument.
+              </p>
+            </div>
+            <ol className="clubs__questions">
+              {DISCUSSION_QUESTIONS.map((question) => (
+                <li key={question}>{question}</li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* Speaking -------------------------------------------------------- */}
+        {SHOW_SPEAKING && (
+          <section id="speaking" className="section">
+            <div className="shell">
+              <p className="eyebrow">Speaking &amp; Events</p>
+              <h2 className="serif section-title" style={{ maxWidth: "26ch" }}>
+                Talks, panels, and internal sessions
+              </h2>
+              <p className="speaking__lead">
+                Available for conference talks, engineering all-hands, architecture guilds, and
+                leadership offsites. Topics include platform engineering, inner source, cloud
+                native security, AI governance, and what it actually takes to open a closed
+                enterprise.
+              </p>
+
+              <div className="topics">
+                {SPEAKING.topics.map((topic) => (
+                  <span key={topic} className="topic">
+                    {topic}
+                  </span>
+                ))}
+              </div>
+
+              <div className="card-rail">
+                {SPEAKING.talks.map((talk) => (
+                  <a
+                    key={talk.url}
+                    className="card card--talk"
+                    href={talk.url}
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <span className="card__title">{talk.title}</span>
+                    <span className="card__blurb">{talk.blurb}</span>
+                    <span className="card__more">Session details →</span>
+                  </a>
+                ))}
+              </div>
+
+              <div className="speaking__foot">
+                <div>
+                  <p className="subhead">Stages</p>
+                  <div className="events">
+                    {SPEAKING.events.map((event) => (
+                      <div key={event.name} className="event">
+                        <span className="event__name">{event.name}</span>
+                        <span className="event__when">
+                          {event.date} · {event.place}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="subhead">Booking &amp; press</p>
+                  <p className="booking__copy">
+                    Invite me through Sessionize, or reach out directly on LinkedIn.
+                  </p>
+                  <div className="notify__links">
+                    <a
+                      className="btn btn--gold btn--sm"
+                      href={LINKS.sessionize}
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      Invite via Sessionize
+                    </a>
+                    <a
+                      className="btn btn--ghost btn--sm"
+                      href={LINKS.linkedin}
+                      target="_blank"
+                      rel="noopener"
+                    >
+                      LinkedIn
+                    </a>
+                  </div>
+                  <p className="mono" style={{ marginTop: 22 }}>
+                    Sessions and stages from sessionize.com/eddie-wassef · last updated{" "}
+                    {SPEAKING.updated}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Closing --------------------------------------------------------- */}
+        <section className="closing">
+          <div className="closing__inner">
+            <p className="serif closing__quote">
+              The real danger isn&rsquo;t change. It&rsquo;s choosing not to.
+            </p>
+            <p className="closing__attr">
+              {SITE.title} · {SITE.author}
+            </p>
+            <a className="btn btn--gold" href="#buy">
+              Get the book
+            </a>
+          </div>
+        </section>
+      </main>
+
+      <footer className="footer">
+        <p className="mono" style={{ margin: 0 }}>
+          © 2026 {SITE.author} · All rights reserved
+        </p>
+        <div className="footer__links">
+          <a href={LINKS.publication} target="_blank" rel="noopener">
+            Medium
+          </a>
+          <a href={LINKS.linkedin} target="_blank" rel="noopener">
+            LinkedIn
+          </a>
+          <a href={LINKS.twitter} target="_blank" rel="noopener">
+            @ewassef
+          </a>
+          <a href={LINKS.sessionize} target="_blank" rel="noopener">
+            Speaking
+          </a>
+          <a href={LINKS.archetypical} target="_blank" rel="noopener">
+            Archetypical
+          </a>
+          <a href="#buy">Buy</a>
         </div>
       </footer>
-
-      <a className="mobile-cta" href="#updates">Join the Launch List <ArrowIcon /></a>
-
-      {sampleOpen && (
-        <div className="modal-backdrop" role="presentation" onMouseDown={() => setSampleOpen(false)}>
-          <div className="sample-modal" role="dialog" aria-modal="true" aria-labelledby="sample-title" onMouseDown={(event) => event.stopPropagation()}>
-            <button className="modal-close" type="button" aria-label="Close sample" onClick={() => setSampleOpen(false)}>×</button>
-            <p className="eyebrow">An opening glimpse</p>
-            <h2 id="sample-title">The first warning<br /><em>didn’t look like one.</em></h2>
-            <div className="sample-copy">
-              <p className="dropcap">The meeting had been scheduled for forty-five minutes, which meant no one expected anything to change.</p>
-              <p>Outside the glass, the last light settled over the refinery. Inside, twelve people studied a slide titled <strong>Modernization Readiness</strong>, each waiting for someone else to say what the numbers already had.</p>
-              <p>The company was not failing. Its systems were stable. Its vendors were trusted. Its controls had passed every audit.</p>
-              <p>And yet, somewhere beyond those walls, the market had begun moving without them.</p>
-            </div>
-            <p className="sample-note">Sample text for preview. Final chapter excerpt coming soon.</p>
-            <a className="button button-primary" href="#updates" onClick={() => setSampleOpen(false)}>Get the Full Sample <ArrowIcon /></a>
-          </div>
-        </div>
-      )}
-    </main>
+    </>
   );
 }
